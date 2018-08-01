@@ -40,26 +40,41 @@ public class BookingTester
         oSelect.selectByVisibleText(booking.getFlightClass());
     }
 
-    public void testUpdateBooking(Booking booking)
+    public void testUpdateBooking(String flightID, Booking booking)
     {
         List<WebElement> rows = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr"));
         // /html/body/div/div/div[2]/div/table
         int bookings = rows.size()-1;
+        int rowID = -1;
 
-        List<WebElement> colVals = rows.get(bookings).findElements(By.tagName("td"));
+        for(int i=1; i<rows.size(); i++)
+        {
+            String checkFlightID = rows.get(i).findElements(By.tagName("td")).get(3).getText();
+            if(checkFlightID.equals(flightID))
+            {
+                rowID = i;
+                break;
+            }
+        }
+
+        List<WebElement> colVals = rows.get(rowID).findElements(By.tagName("td"));
         String flightNo = colVals.get(3).getText();
         String seatID = colVals.get(4).getText();
-        colVals.get(0).findElement(By.linkText("Update")).click();
 
-        populateBooking(booking);
-        clickBookingButton();
+        if(rowID>0)
+        {
+            colVals.get(0).findElement(By.linkText("Update")).click();
 
-        driver.findElement(By.linkText("itinerary")).click();
-        rows = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr"));
-        colVals = rows.get(bookings).findElements(By.tagName("td"));
+            populateBooking(booking);
+            clickBookingButton();
 
-        Assert.assertEquals(flightNo, colVals.get(3).getText());
-        Assert.assertNotEquals(seatID, colVals.get(4).getText());
+            driver.findElement(By.linkText("itinerary")).click();
+            rows = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr"));
+            colVals = rows.get(rowID).findElements(By.tagName("td"));
+
+            Assert.assertEquals(flightNo, colVals.get(3).getText());
+            Assert.assertNotEquals(seatID, colVals.get(4).getText());
+        }
     }
 
     public void testDeleteBooking(String flightID)
@@ -71,16 +86,21 @@ public class BookingTester
         for(int i=1; i<rows.size(); i++)
         {
             String checkFlightID = rows.get(i).findElements(By.tagName("td")).get(3).getText();
-            if(checkFlightID.equals(flightID));
+            if(checkFlightID.equals(flightID))
             {
                 rowID = i;
-                System.out.println(i);
                 break;
             }
         }
 
-        List<WebElement> colVals = rows.get(rowID).findElements(By.tagName("td"));
-        //colVals.get(0).findElement(By.linkText("Delete")).click();
+        if(rowID > 0)
+        {
+            List<WebElement> colVals = rows.get(rowID).findElements(By.tagName("td"));
+            colVals.get(0).findElement(By.linkText("Delete")).click();
+
+            List<WebElement> rows2 = driver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr"));
+            Assert.assertTrue(rows.size() > rows2.size());
+        }
     }
 
     public void clickBookingButton()

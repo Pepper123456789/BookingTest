@@ -53,17 +53,17 @@ public class CloudApp
     @Test
     public void testUpdate()
     {
-        users.get(0).getBookings().get(0).setOrigin("Durban");
-        users.get(0).getBookings().get(0).setDestination("London");
-        users.get(0).getBookings().get(0).setFlightClass("Economy");
-        users.get(0).getBookings().get(0).setSeat("15E");
+        users.get(0).getBookings().get(0).setOrigin("Chicago");
+        users.get(0).getBookings().get(0).setDestination("Dubai");
+        users.get(0).getBookings().get(0).setFlightClass("Business");
+        users.get(0).getBookings().get(0).setSeat("32C");
 
         log.assertLoginHeader();
         log.populateLogin(users.get(0));
         log.clickLogin();
         log.assertLoginComplete();
         book.navigateToItinerary();
-        book.testUpdateBooking(users.get(0).getBookings().get(0));
+        book.testUpdateBooking("193", users.get(0).getBookings().get(0));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class CloudApp
         log.assertLoginComplete();
 
         book.navigateToItinerary();
-        book.testDeleteBooking("191");
+        book.testDeleteBooking("195");
     }
 
     @Test
