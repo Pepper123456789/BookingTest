@@ -1,5 +1,7 @@
 package cloud9;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -7,6 +9,7 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -88,6 +91,22 @@ public class CloudApp
         reg.assertRegistrationComplete();
     }
 
+    public Sheet getSheet()
+    {
+        Sheet db = null;
+
+        try
+        {
+            db = ExcelReader.readExcel("C:\\Users\\Student01\\IdeaProjects\\cloud9\\src\\main\\java\\resources\\",
+                    "Cloud9Database.xlsx", "Sheet1");
+        }
+        catch (IOException e)
+        {
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAA");
+        }
+        return db;
+    }
+
     @Before
     public void setUpBeforeTest()
     {
@@ -97,7 +116,16 @@ public class CloudApp
         reg = new RegistrationTester(driver);
         book = new BookingTester(driver);
 
-        users.add(new User("Not", "Real", "notarealmail@hotmail.com", "password"));
+        Sheet db = getSheet();
+
+        for(int i=1; i<db.getLastRowNum(); i++)
+        {
+            Row userRow = db.getRow(i);
+
+            users.add(new User(userRow.getCell(0).getStringCellValue(), userRow.getCell(1).getStringCellValue(),
+                    userRow.getCell(2).getStringCellValue(), userRow.getCell(3).getStringCellValue()));
+
+        }
         users.get(0).addBooking("London", "Dubai", "12E", "Economy");
 
         String baseURL = "http://10.9.10.139:81/sqlite/Main/login.html";
